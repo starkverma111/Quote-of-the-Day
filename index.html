@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quote of the Day</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.min.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+ * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+.box {
+  --mask: 
+    linear-gradient(#000 0 0) 50%/calc(100% - 24.75px) calc(100% - 24.75px) no-repeat,
+    radial-gradient(farthest-side,#000 98%,#0000) 0 0/30px 30px round;
+  -webkit-mask: var(--mask);
+          mask: var(--mask);
+}
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-600 to-gray-800">
+  <div class="box p-6 bg-white bg-slate-300 drop-shadow-lg
+
+">
+  <div 
+    class=" w-full max-w-xl bg-white p-8" 
+    x-data="quoteApp()" 
+    x-init="fetchQuote()"
+  >
+    <header class="text-4xl font-medium text-center text-gray-800">Quote of the Day</header>
+    <div class="mt-8">
+      <div class="flex justify-center items-center text-gray-800">
+        <i class="fas fa-quote-left text-lg mr-2 -mt-10"></i>
+        <p class="text-lg text-center break-words" x-text="quote"></p>
+        <i class="fas fa-quote-right text-lg ml-2 mt-8"></i>
+      </div>
+      <div class="flex justify-end items-center mt-4 italic text-gray-600">
+        <span class="mr-1">__</span>
+        <span class="font-mono" x-text="author"></span>
+      </div>
+    </div>
+    <div class="border-t mt-6 pt-4">
+      <div class="flex justify-between items-center">
+        <ul class="flex space-x-3">
+          <li class="flex items-center justify-center w-10 h-10 border-2 border-blue-600 text-blue-700 rounded-full cursor-pointer hover:bg-blue-600 hover:text-white" @click="speakQuote()">
+            <i class="fas fa-volume-up"></i>
+          </li>
+          <li class="flex items-center justify-center w-10 h-10 border-2 border-blue-600 text-blue-700 rounded-full cursor-pointer hover:bg-blue-600 hover:text-white" @click="copyToClipboard()">
+            <i class="fas fa-copy"></i>
+          </li>
+          <li class="flex items-center justify-center w-10 h-10 border-2 border-blue-600 text-blue-700 rounded-full cursor-pointer hover:bg-blue-600 hover:text-white">
+            <a :href="`https://twitter.com/intent/tweet?text=${encodeURIComponent(quote)} - ${author}`" target="_blank">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </li>
+		            <li class="flex items-center justify-center w-10 h-10 border-2 border-blue-600 text-blue-700 rounded-full cursor-pointer hover:bg-blue-600 hover:text-white">
+            <a :href="`https://twitter.com/intent/tweet?text=${encodeURIComponent(quote)} - ${author}`" target="_blank">
+              <i class="fab fa-tiktok"></i>
+            </a>
+          </li>
+        </ul>
+        <button 
+          class="px-6 py-3 text-white bg-blue-600 rounded-full hover:bg-blue-600" 
+          @click="fetchQuote"
+        >
+          New Quote
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script>
+    function quoteApp() {
+      return {
+        quote: 'Loading...',
+        author: '',
+        fetchQuote() {
+          fetch('https://quotes-api-self.vercel.app/quote')
+            .then(response => response.json())
+            .then(data => {
+              this.quote = data.quote;
+              this.author = data.author;
+            })
+            .catch(error => {
+              this.quote = 'Failed to fetch quote. Please try again.';
+              this.author = '';
+              console.error(error);
+            });
+        },
+        speakQuote() {
+          const utterance = new SpeechSynthesisUtterance(`${this.quote} by ${this.author}`);
+          speechSynthesis.speak(utterance);
+        },
+        copyToClipboard() {
+          const textToCopy = `"${this.quote}" - ${this.author}`;
+          navigator.clipboard.writeText(textToCopy)
+            .then(() => alert('Quote copied to clipboard!'))
+            .catch(error => console.error('Copy failed:', error));
+        }
+      };
+    }
+  </script>
+</body>
+</html>
